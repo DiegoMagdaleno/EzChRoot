@@ -34,7 +34,6 @@ package lib
 import (
 	"io/ioutil"
 	"os/exec"
-	"regexp"
 	"strings"
 )
 
@@ -51,13 +50,10 @@ func stringInSlice(str string, list []string) bool {
 to run under the chroot. Logic can be improved so
 TODO: Improve piping method*/
 func GetLinkedLibs(libFile string) ([]string, error) {
-	regex, err := regexp.Compile("\n\n")
 	cleaned := []string{}
 	content, err := ioutil.ReadFile(libFile)
 	var (
-		libs      []string
 		firstCalc []string
-		libsClean []string
 		splitOut  []string
 	)
 	if err != nil {
@@ -75,14 +71,7 @@ func GetLinkedLibs(libFile string) ([]string, error) {
 			firstCalc = append(firstCalc, splitOut[k])
 		}
 	}
-	for i := range firstCalc {
-		var secondCalc string
-		secondCalc = regex.ReplaceAllString(firstCalc[i], "\n")
-		libs = append(libs, secondCalc)
-		final := strings.TrimSpace(libs[i])
-		libsClean = append(libsClean, final)
-	}
-	for _, value := range libsClean {
+	for _, value := range firstCalc {
 
 		if !stringInSlice(value, cleaned) {
 			cleaned = append(cleaned, value)

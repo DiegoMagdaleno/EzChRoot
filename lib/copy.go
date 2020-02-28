@@ -28,20 +28,23 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
-package main
+
+package lib
 
 import (
-	"fmt"
-
-	"github.com/diegomagdaleno/EzChRoot/lib"
+	"io/ioutil"
+	"strings"
 )
 
-func main() {
-	test, err := lib.GetLinkedLibs("./default.files")
+func fileToSlice(file string) ([]string, error) {
+	content, err := ioutil.ReadFile(file)
 	if err != nil {
-		fmt.Println("Lol")
+		panic("Error reading the file, do you have perms for it?")
 	}
-	for i := range test {
-		fmt.Println(test[i])
-	}
+	lines := strings.Split(string(content), "\n")
+	return lines, err
+}
+
+func CopyToDir(bins []string, libs []string, path string) {
+	libs = append(libs, bins...)
 }
