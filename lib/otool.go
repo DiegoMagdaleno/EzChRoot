@@ -32,10 +32,16 @@ POSSIBILITY OF SUCH DAMAGE.
 package lib
 
 import (
-	"io/ioutil"
 	"os/exec"
 	"strings"
 )
+
+var (
+	librariesCalc  []string
+	librariesSplit []string
+)
+
+var libraries = []string{}
 
 func stringInSlice(str string, list []string) bool {
 	for _, v := range list {
@@ -49,20 +55,9 @@ func stringInSlice(str string, list []string) bool {
 /*GetLinkedLibs exports unique list of libs required for the programs
 to run under the chroot. Logic can be improved so
 TODO: Improve piping method*/
-func GetLinkedLibs(libraryFile string) ([]string, error) {
-	libraries := []string{}
-	var (
-		librariesCalc  []string
-		librariesSplit []string
-		lines          []string
-	)
-	content, err := ioutil.ReadFile(libraryFile)
-	if err != nil {
-		panic("Couldn't read the file, into memory. Does the file exists? or you have the proper perms?")
-	}
-	lines = strings.Split(string(content), "\n")
-	for i := range lines {
-		cmd := "otool -L " + lines[i] + "| sed 1d | awk '{print $1}' | xargs echo -n"
+func GetLinkedLibs(libraryFile []string) []string {
+	for i := range libraryFile {
+		cmd := "otool -L " + libraryFile[i] + "| sed 1d | awk '{print $1}' | xargs echo -n"
 		out, err := exec.Command("bash", "-c", cmd).Output()
 		if err != nil {
 			panic("Couldn't execute the command, do you have xcode installed?")
@@ -78,5 +73,8 @@ func GetLinkedLibs(libraryFile string) ([]string, error) {
 			libraries = append(libraries, value)
 		}
 	}
-	return libraries, err
+	if len(libraryFile) == len(libraries) {
+		return libraries
+	}
+	return GetLinkedLibs(libraries)
 }

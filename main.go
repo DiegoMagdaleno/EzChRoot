@@ -32,12 +32,17 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"strings"
 
 	"github.com/diegomagdaleno/EzChRoot/lib"
 )
 
 func main() {
-	test, err := lib.GetLinkedLibs("./default.files")
+	content, err := ioutil.ReadFile("./default.files")
+	s := strings.Split(string(content), "\n")
+	fmt.Println(s)
+	test := lib.GetLinkedLibs(s)
 	if err != nil {
 		fmt.Println("Lol")
 	}
