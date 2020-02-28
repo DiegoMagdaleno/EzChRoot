@@ -49,33 +49,34 @@ func stringInSlice(str string, list []string) bool {
 /*GetLinkedLibs exports unique list of libs required for the programs
 to run under the chroot. Logic can be improved so
 TODO: Improve piping method*/
-func GetLinkedLibs(libFile string) ([]string, error) {
-	cleaned := []string{}
-	content, err := ioutil.ReadFile(libFile)
+func GetLinkedLibs(libraryFile string) ([]string, error) {
+	libraries := []string{}
 	var (
-		firstCalc []string
-		splitOut  []string
+		librariesCalc  []string
+		librariesSplit []string
+		lines          []string
 	)
+	content, err := ioutil.ReadFile(libraryFile)
 	if err != nil {
-		panic("What?")
+		panic("Couldn't read the file, into memory. Does the file exists? or you have the proper perms?")
 	}
-	lines := strings.Split(string(content), "\n")
+	lines = strings.Split(string(content), "\n")
 	for i := range lines {
 		cmd := "otool -L " + lines[i] + "| sed 1d | awk '{print $1}' | xargs echo -n"
 		out, err := exec.Command("bash", "-c", cmd).Output()
 		if err != nil {
-			panic("Huoh")
+			panic("Couldn't execute the command, do you have xcode installed?")
 		}
-		splitOut = strings.Split((string(out)), " ")
-		for k := range splitOut {
-			firstCalc = append(firstCalc, splitOut[k])
+		librariesSplit = strings.Split((string(out)), " ")
+		for k := range librariesSplit {
+			librariesCalc = append(librariesCalc, librariesSplit[k])
 		}
 	}
-	for _, value := range firstCalc {
+	for _, value := range librariesCalc {
 
-		if !stringInSlice(value, cleaned) {
-			cleaned = append(cleaned, value)
+		if !stringInSlice(value, libraries) {
+			libraries = append(libraries, value)
 		}
 	}
-	return cleaned, err
+	return libraries, err
 }
