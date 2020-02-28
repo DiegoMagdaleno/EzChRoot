@@ -69,7 +69,7 @@ func GetLinkedLibs(libraryFile []string) []string {
 	}
 	for _, value := range librariesCalc {
 
-		if !stringInSlice(value, libraries) {
+		if !stringInSlice(value, libraries) && (value != "\n") && (len(value) != 0) {
 			libraries = append(libraries, value)
 		}
 	}

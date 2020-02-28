@@ -41,12 +41,9 @@ import (
 func main() {
 	content, err := ioutil.ReadFile("./default.files")
 	s := strings.Split(string(content), "\n")
-	fmt.Println(s)
 	test := lib.GetLinkedLibs(s)
 	if err != nil {
 		fmt.Println("Lol")
 	}
-	for i := range test {
-		fmt.Println(test[i])
-	}
+	lib.CopyToDir(s, test, "/opt/jails/test")
 }

@@ -13,7 +13,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors
-   may be used to endorse or promote products derived from this software
+   may be used to endorse or promote products derived orgRoot this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -32,7 +32,10 @@ POSSIBILITY OF SUCH DAMAGE.
 package lib
 
 import (
+	"io"
 	"io/ioutil"
+	"log"
+	"os"
 	"strings"
 )
 
@@ -45,6 +48,34 @@ func fileToSlice(file string) ([]string, error) {
 	return lines, err
 }
 
+/*CopyToDir allows us to copy the generated paths to the
+final destination to where the user wants the chroot to be
+generated*/
 func CopyToDir(bins []string, libs []string, path string) {
-	libs = append(libs, bins...)
+	libs = append(bins, libs...)
+	for i := range libs {
+		splitStr := strings.Split(path+libs[i], "/")
+		dst := splitStr[:len(splitStr)-1]
+		dstString := strings.Join(dst, "/")
+		if _, err := os.Stat(dstString); os.IsNotExist(err) {
+			os.MkdirAll(dstString, 0777)
+		}
+		orgRoot, err := os.Open(libs[i])
+		if err != nil {
+			log.Fatal(err)
+		}
+		destRoot, err := os.OpenFile(path+libs[i], os.O_RDWR|os.O_CREATE, 0777)
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, err = io.Copy(destRoot, orgRoot)
+		if err != nil {
+			log.Fatal(err)
+		}
+		/* We don't use defer, since there are a lot of files, is a lot of
+		pressure into the memory.
+		Reference: https://stackoverflow.com/questions/37804804/too-many-open-file-error-in-golang */
+		orgRoot.Close()
+		destRoot.Close()
+	}
 }
