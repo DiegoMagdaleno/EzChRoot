@@ -46,4 +46,5 @@ func main() {
 		fmt.Println("Lol")
 	}
 	lib.CopyToDir(s, test, "/opt/jails/test")
+	lib.CopyAdditionalSettings("/opt/jails/test")
 }
