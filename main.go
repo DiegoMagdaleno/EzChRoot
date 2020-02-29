@@ -31,20 +31,9 @@ POSSIBILITY OF SUCH DAMAGE.
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
-	"strings"
-
-	"github.com/diegomagdaleno/EzChRoot/lib"
+	"github.com/diegomagdaleno/EzChRoot/cmd"
 )
 
 func main() {
-	content, err := ioutil.ReadFile("./default.files")
-	s := strings.Split(string(content), "\n")
-	test := lib.GetLinkedLibs(s)
-	if err != nil {
-		fmt.Println("Lol")
-	}
-	lib.CopyToDir(s, test, "/opt/jails/test")
-	lib.CopyAdditionalSettings("/opt/jails/test")
+	cmd.Execute()
 }

@@ -32,13 +32,19 @@ package cmd
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"regexp"
+	"time"
 
+	"github.com/briandowns/spinner"
+	"github.com/diegomagdaleno/EzChRoot/lib"
 	"github.com/spf13/cobra"
 )
 
 // createCmd represents the create command
 var createCmd = &cobra.Command{
-	Use:   "create",
+	Use:   "create [name] [path]",
 	Short: "create a new chroot",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -47,20 +53,49 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("create called")
+		var (
+			validateName, _  = regexp.Compile("^[a-zA-Z]+$")
+			name             = args[0]
+			path             = args[1]
+			s                = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
+			coreApplications = []string{"/bin/sh", "/bin/bash", "/bin/cat", "/bin/ls", "/bin/mkdir", "/bin/mv", "/bin/rm", "/bin/rmdir", "/bin/sh", "/bin/sleep", "/sbin/ping", "/usr/bin/curl", "/usr/bin/dig", "/usr/bin/env", "/usr/bin/grep", "/usr/bin/host", "/usr/bin/id", "/usr/bin/less", "/usr/bin/ssh", "/usr/bin/ssh-add", "/usr/bin/uname", "/usr/bin/vi", "/usr/lib/dyld", "/usr/sbin/netstat"}
+		)
+		if !validateName.Match([]byte(args[0])) {
+			log.Fatal(args[0] + " is not a valid name!")
+		}
+		if _, err := os.Stat(args[1]); os.IsNotExist(err) {
+			fmt.Println("Selected path doesn't exist, will attempt to create it...")
+			makeDirErr := os.Mkdir(args[1], 0777)
+			if makeDirErr != nil {
+				log.Fatal("The directory " + args[1] + " couldn't be created")
+			}
+			fmt.Println("\342\234\223 Path was created sucessfully")
+		}
+		s.Color("green")
+
+		s.Suffix = " Calculting dependencies for core system... "
+		s.FinalMSG = "\342\234\223 Done calculating dependencies... \n"
+		s.Start()
+		coreLibs := lib.GetLinkedLibs(coreApplications)
+		s.Stop()
+
+		s.Suffix = " Copying core system into selected directory... "
+		s.FinalMSG = "\342\234\223 Done copying core system into selected directory... \n"
+
+		s.Start()
+		lib.CopyToDir(coreApplications, coreLibs, path+"/"+name)
+		s.Stop()
+
+		s.Suffix = " Copying additional files into selected directory... "
+		s.FinalMSG = "\342\234\223 Done with copying additional files to selected directory... \n"
+
+		s.Start()
+		lib.CopyAdditionalSettings(path + "/" + name)
+		s.Stop()
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(createCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// createCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
