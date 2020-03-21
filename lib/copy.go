@@ -112,7 +112,7 @@ func CopyAdditionalSettings(path string) {
 			log.Fatal(err)
 		}
 	}
-	var additionalFiles = []string{"/dev/null", "/dev/console", "/dev/tty", "/usr/share/terminfo", realUser + "/.ssh", "/etc/hosts", "/etc/resolv.conf"}
+	var additionalFiles = []string{"/dev/null", "/dev/console", "/dev/tty", realUser + "/.ssh", "/etc/hosts", "/etc/resolv.conf"}
 	for i := range additionalFiles {
 
 		splitStr := strings.Split(path+additionalFiles[i], "/")
@@ -146,5 +146,9 @@ func CopyAdditionalSettings(path string) {
 		origFiles.Close()
 		destFiles.Close()
 
+	}
+	err := cp.Copy("/usr/share/terminfo", path+"/usr/share/terminfo")
+	if err != nil {
+		log.Panic(err)
 	}
 }
