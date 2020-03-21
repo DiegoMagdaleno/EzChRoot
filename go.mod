@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/b4b4r07/go-pipe v0.0.0-20191010045404-84b446f57366
 	github.com/briandowns/spinner v1.9.0
+	github.com/codeskyblue/go-sh v0.0.0-20190412065543-76bd3d59ff27
 	github.com/gosuri/uilive v0.0.4 // indirect
 	github.com/gosuri/uiprogress v0.0.1
 	github.com/mattn/go-isatty v0.0.12 // indirect

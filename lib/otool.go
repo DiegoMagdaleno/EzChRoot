@@ -32,8 +32,11 @@ POSSIBILITY OF SUCH DAMAGE.
 package lib
 
 import (
-	"os/exec"
+	"log"
+	"reflect"
 	"strings"
+
+	"github.com/codeskyblue/go-sh"
 )
 
 var (
@@ -57,24 +60,25 @@ to run under the chroot. Logic can be improved so
 TODO: Improve piping method*/
 func GetLinkedLibs(libraryFile []string) []string {
 	for i := range libraryFile {
-		cmd := "otool -L " + libraryFile[i] + "| sed 1d | awk '{print $1}' | xargs echo -n"
-		out, err := exec.Command("bash", "-c", cmd).Output()
+		test, err := sh.Command("otool", "-L", libraryFile[i]).Command("sed", "1d").Command("awk", "{print $1}").Command("xargs", "echo", "-n").Output()
 		if err != nil {
-			panic("Couldn't execute the command, do you have xcode installed?")
+			log.Panic(err)
 		}
-		librariesSplit = strings.Split((string(out)), " ")
+		librariesSplit = strings.Split(string((test)), " ")
 		for k := range librariesSplit {
 			librariesCalc = append(librariesCalc, librariesSplit[k])
 		}
-	}
-	for _, value := range librariesCalc {
 
-		if !stringInSlice(value, libraries) && (value != "\n") && (len(value) != 0) {
-			libraries = append(libraries, value)
+		for _, value := range librariesCalc {
+
+			if !stringInSlice(value, libraries) && (value != "\n") && (len(value) != 0) {
+				libraries = append(libraries, value)
+			}
 		}
-	}
-	if len(libraryFile) == len(libraries) {
-		return libraries
+
+		if reflect.DeepEqual(libraryFile, libraries) == true {
+			return libraries
+		}
 	}
 	return GetLinkedLibs(libraries)
 }
