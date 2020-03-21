@@ -33,7 +33,9 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"time"
 
+	"github.com/briandowns/spinner"
 	"github.com/diegomagdaleno/EzChRoot/lib"
 	"github.com/spf13/cobra"
 )
@@ -49,12 +51,18 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var name = args[0]
-		isRegistered, value := lib.ManageConfig(name)
+		var (
+			s    = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
+			name = args[0]
+		)
+		s.Color("green")
 
+		isRegistered, value := lib.ManageConfig(name)
 		if isRegistered {
-			fmt.Println("The chroot: " + name + " is being deleted")
+			s.Suffix = " The chroot: " + name + " is being deleted"
+			s.FinalMSG = "\342\234\223 The chroot: " + name + " has been deleted \n"
 			os.RemoveAll(value)
+			s.Stop()
 		} else {
 			fmt.Println("The chroot: " + value + " coulnd't be deleted because it isnt in your registed directories")
 		}

@@ -12,7 +12,8 @@
 *.out
 
 # Dependency directories (remove the comment below to include it)
-# vendor/
+bin/
+vendor/
 .DS_Store
 *.[56789ao]
 *.a[56789o]
