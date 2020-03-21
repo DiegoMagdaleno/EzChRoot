@@ -41,7 +41,7 @@ Here is some information on how to install EzChRoot in your Mac!
   - Create a chroot
   - Delete a chroot
   
-  ## Contributing
+ ## Contributing
   
   - **Contributing code**:
  
@@ -53,7 +53,7 @@ Here is some information on how to install EzChRoot in your Mac!
       3. Hack it and have fun.
       4. Push and submit a pull request!
 
-  - **Contributing ideas and request**:
+  - **Contributing ideas and requests**:
   
     If you like and enjoy EzChroot but you still think there is a feature missing, don't hesitate to ask nicely about it!
     
