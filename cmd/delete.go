@@ -32,13 +32,15 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/diegomagdaleno/EzChRoot/lib"
 	"github.com/spf13/cobra"
 )
 
 // deleteCmd represents the delete command
 var deleteCmd = &cobra.Command{
-	Use:   "delete",
+	Use:   "delete [chroot name] or [chroot path]",
 	Short: "Delete a chroot",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -47,20 +49,18 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("delete called")
+		var name = args[0]
+		isRegistered, value := lib.ManageConfig(name)
+
+		if isRegistered {
+			fmt.Println("The chroot: " + name + " is being deleted")
+			os.RemoveAll(value)
+		} else {
+			fmt.Println("The chroot: " + value + " coulnd't be deleted because it isnt in your registed directories")
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(deleteCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// deleteCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// deleteCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

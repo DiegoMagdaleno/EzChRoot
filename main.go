@@ -30,9 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package main
 
-import (
-	"github.com/diegomagdaleno/EzChRoot/cmd"
-)
+import "github.com/diegomagdaleno/EzChRoot/cmd"
 
 func main() {
 	cmd.Execute()
