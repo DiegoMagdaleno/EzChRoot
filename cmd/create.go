@@ -35,6 +35,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"runtime"
 	"time"
 
 	"github.com/briandowns/spinner"
@@ -53,13 +54,20 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		var coreApplications []string
+		var coreLibs []string
 		var (
-			validateName, _  = regexp.Compile("^[a-zA-Z]+$")
-			name             = args[0]
-			path             = args[1]
-			s                = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
-			coreApplications = []string{"/bin/sh", "/bin/bash", "/bin/cat", "/bin/ls", "/bin/mkdir", "/bin/mv", "/bin/rm", "/bin/rmdir", "/bin/sh", "/bin/sleep", "/sbin/ping", "/usr/bin/curl", "/usr/bin/dig", "/usr/bin/env", "/usr/bin/grep", "/usr/bin/host", "/usr/bin/id", "/usr/bin/less", "/usr/bin/ssh", "/usr/bin/ssh-add", "/usr/bin/uname", "/usr/bin/vi", "/usr/lib/dyld", "/usr/sbin/netstat", "/usr/bin/clear"}
+			validateName, _ = regexp.Compile("^[a-zA-Z]+$")
+			name            = args[0]
+			path            = args[1]
+			s               = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 		)
+		switch os := runtime.GOOS; os {
+		case "darwin":
+			coreApplications = []string{"/bin/sh", "/bin/bash", "/bin/cat", "/bin/ls", "/bin/mkdir", "/bin/mv", "/bin/rm", "/bin/rmdir", "/bin/sleep", "/sbin/ping", "/usr/bin/curl", "/usr/bin/dig", "/usr/bin/env", "/usr/bin/grep", "/usr/bin/host", "/usr/bin/id", "/usr/bin/less", "/usr/bin/ssh", "/usr/bin/ssh-add", "/usr/bin/uname", "/usr/bin/vi", "/usr/lib/dyld", "/usr/sbin/netstat", "/usr/bin/clear"}
+		case "linux":
+			coreApplications = []string{"/usr/bin/sh", "/usr/bin/bash", "/usr/bin/cat", "/usr/bin/ls", "/usr/bin/mkdir", "/usr/bin/mv", "/usr/bin/dash", "/usr/bin/rm", "/usr/bin/rmdir", "/usr/bin/sh", "/usr/bin/sleep", "/usr/bin/ping", "/usr/bin/curl", "/usr/bin/env", "/usr/bin/grep", "/usr/bin/id", "/usr/bin/less", "/usr/bin/ssh", "/usr/bin/ssh-add", "/usr/bin/uname", "/usr/bin/vi", "/usr/bin/ld", "/usr/bin/clear"}
+		}
 		if !validateName.Match([]byte(args[0])) {
 			log.Fatal(args[0] + " is not a valid name!")
 		}
@@ -76,7 +84,12 @@ to quickly create a Cobra application.`,
 		s.Suffix = " Calculting dependencies for core system... "
 		s.FinalMSG = "\342\234\223 Done calculating dependencies... \n"
 		s.Start()
-		coreLibs := lib.GetLinkedLibs(coreApplications)
+		switch os := runtime.GOOS; os {
+		case "darwin":
+			coreLibs = lib.GetLinkedLibsDarwin(coreApplications)
+		case "linux":
+			coreLibs = lib.GetLinkedLibsLinux(coreApplications)
+		}
 		s.Stop()
 
 		s.Suffix = " Copying core system into selected directory... "

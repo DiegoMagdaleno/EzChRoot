@@ -89,7 +89,7 @@ func GetLinkedLibsLinux(libraryFile []string) []string {
 	for i := range libraryFile {
 		// This was pain to write, it took me hours to figure out how to split the output
 		// because I didnt know awk an sed.
-		library, err := sh.Command("ldd", libraryFile[i]).Command("sed", "1d").Command("awk", "{print $3}").Output()
+		library, err := sh.Command("ldd", libraryFile[i]).Command("awk", "{print $3}").Output()
 		if err != nil {
 			fmt.Println(err)
 		}

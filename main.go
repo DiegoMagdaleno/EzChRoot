@@ -30,14 +30,8 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package main
 
-import (
-	"fmt"
-
-	"github.com/diegomagdaleno/EzChRoot/lib"
-)
+import "github.com/diegomagdaleno/EzChRoot/cmd"
 
 func main() {
-	var coreApplications = []string{"/bin/sh", "/bin/bash", "/bin/cat", "/bin/ls", "/bin/mkdir", "/bin/mv", "/bin/rm", "/bin/rmdir", "/bin/sh", "/bin/sleep", "/sbin/ping", "/usr/bin/curl", "/usr/bin/env", "/usr/bin/grep", "/usr/bin/id", "/usr/bin/less", "/usr/bin/ssh", "/usr/bin/ssh-add", "/usr/bin/uname", "/usr/bin/vi", "/usr/bin/clear"}
-	test := lib.GetLinkedLibsLinux(coreApplications)
-	fmt.Println(test)
+	cmd.Execute()
 }
