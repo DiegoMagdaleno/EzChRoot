@@ -94,7 +94,18 @@ func GetLinkedLibsLinux(libraryFile []string) []string {
 			fmt.Println(err)
 		}
 		librariesSplit = strings.Split(string(library), "\n")
-		fmt.Println(librariesSplit)
+		for k := range librariesSplit {
+			librariesCalc = append(librariesCalc, librariesSplit[k])
+		}
+		for _, value := range librariesCalc {
+			if !stringInSlice(value, libraries) && (value != "\n") && (len(value) != 0) {
+				libraries = append(libraries, value)
+			}
+		}
+
+		if reflect.DeepEqual(libraryFile, libraries) == true {
+			return libraries
+		}
 	}
-	return librariesSplit
+	return GetLinkedLibsLinux(libraries)
 }
