@@ -32,6 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package lib
 
 import (
+	"fmt"
 	"log"
 	"reflect"
 	"strings"
@@ -55,10 +56,9 @@ func stringInSlice(str string, list []string) bool {
 	return false
 }
 
-/*GetLinkedLibs exports unique list of libs required for the programs
-to run under the chroot. Logic can be improved so
-TODO: Improve piping method*/
-func GetLinkedLibs(libraryFile []string) []string {
+/* Function that is specifically for Darwin, gets the linked
+libs using otool */
+func GetLinkedLibsDarwin(libraryFile []string) []string {
 	for i := range libraryFile {
 		test, err := sh.Command("otool", "-L", libraryFile[i]).Command("sed", "1d").Command("awk", "{print $1}").Command("xargs", "echo", "-n").Output()
 		if err != nil {
@@ -80,5 +80,32 @@ func GetLinkedLibs(libraryFile []string) []string {
 			return libraries
 		}
 	}
-	return GetLinkedLibs(libraries)
+	return GetLinkedLibsDarwin(libraries)
+}
+
+/* Function that gets the linked libraries on Linux uses ldd and the
+output is managed diferently) */
+func GetLinkedLibsLinux(libraryFile []string) []string {
+	for i := range libraryFile {
+		// This was pain to write, it took me hours to figure out how to split the output
+		// because I didnt know awk an sed.
+		library, err := sh.Command("ldd", libraryFile[i]).Command("awk", "{print $3}").Output()
+		if err != nil {
+			fmt.Println(err)
+		}
+		librariesSplit = strings.Split(string(library), "\n")
+		for k := range librariesSplit {
+			librariesCalc = append(librariesCalc, librariesSplit[k])
+		}
+		for _, value := range librariesCalc {
+			if !stringInSlice(value, libraries) && (value != "\n") && (len(value) != 0) {
+				libraries = append(libraries, value)
+			}
+		}
+
+		if reflect.DeepEqual(libraryFile, libraries) == true {
+			return libraries
+		}
+	}
+	return GetLinkedLibsLinux(libraries)
 }

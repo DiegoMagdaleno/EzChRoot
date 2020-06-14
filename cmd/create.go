@@ -35,6 +35,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"runtime"
 	"time"
 
 	"github.com/briandowns/spinner"
@@ -53,19 +54,26 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		var coreApplications []string
+		var coreLibs []string
 		var (
-			validateName, _  = regexp.Compile("^[a-zA-Z]+$")
-			name             = args[0]
-			path             = args[1]
-			s                = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
-			coreApplications = []string{"/bin/sh", "/bin/bash", "/bin/cat", "/bin/ls", "/bin/mkdir", "/bin/mv", "/bin/rm", "/bin/rmdir", "/bin/sh", "/bin/sleep", "/sbin/ping", "/usr/bin/curl", "/usr/bin/dig", "/usr/bin/env", "/usr/bin/grep", "/usr/bin/host", "/usr/bin/id", "/usr/bin/less", "/usr/bin/ssh", "/usr/bin/ssh-add", "/usr/bin/uname", "/usr/bin/vi", "/usr/lib/dyld", "/usr/sbin/netstat", "/usr/bin/clear"}
+			validateName, _ = regexp.Compile("^[a-zA-Z]+$")
+			name            = args[0]
+			path            = args[1]
+			s               = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 		)
+		switch os := runtime.GOOS; os {
+		case "darwin":
+			coreApplications = []string{"/bin/sh", "/bin/bash", "/bin/cat", "/bin/ls", "/bin/mkdir", "/bin/mv", "/bin/rm", "/bin/rmdir", "/bin/sleep", "/sbin/ping", "/usr/bin/curl", "/usr/bin/dig", "/usr/bin/env", "/usr/bin/grep", "/usr/bin/host", "/usr/bin/id", "/usr/bin/less", "/usr/bin/ssh", "/usr/bin/ssh-add", "/usr/bin/uname", "/usr/bin/vi", "/usr/lib/dyld", "/usr/sbin/netstat", "/usr/bin/clear"}
+		case "linux":
+			coreApplications = []string{"/bin/bash", "/bin/ls", "/bin/cp", "/bin/rm", "/bin/cat", "/bin/mkdir", "/bin/ln", "/bin/grep", "/bin/cut", "/bin/sed", "/usr/bin/ssh", "/usr/bin/head", "/usr/bin/tail", "/usr/bin/which", "/usr/bin/id", "/usr/bin/find", "/usr/bin/xargs"}
+		}
 		if !validateName.Match([]byte(args[0])) {
 			log.Fatal(args[0] + " is not a valid name!")
 		}
 		if _, err := os.Stat(args[1]); os.IsNotExist(err) {
 			fmt.Println("Selected path doesn't exist, will attempt to create it...")
-			makeDirErr := os.Mkdir(args[1], 0777)
+			makeDirErr := os.MkdirAll(args[1], 0777)
 			if makeDirErr != nil {
 				log.Fatal("The directory " + args[1] + " couldn't be created")
 			}
@@ -76,7 +84,12 @@ to quickly create a Cobra application.`,
 		s.Suffix = " Calculting dependencies for core system... "
 		s.FinalMSG = "\342\234\223 Done calculating dependencies... \n"
 		s.Start()
-		coreLibs := lib.GetLinkedLibs(coreApplications)
+		switch os := runtime.GOOS; os {
+		case "darwin":
+			coreLibs = lib.GetLinkedLibsDarwin(coreApplications)
+		case "linux":
+			coreLibs = lib.GetLinkedLibsLinux(coreApplications)
+		}
 		s.Stop()
 
 		s.Suffix = " Copying core system into selected directory... "
