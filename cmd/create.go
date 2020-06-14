@@ -84,12 +84,7 @@ to quickly create a Cobra application.`,
 		s.Suffix = " Calculting dependencies for core system... "
 		s.FinalMSG = "\342\234\223 Done calculating dependencies... \n"
 		s.Start()
-		switch os := runtime.GOOS; os {
-		case "darwin":
-			coreLibs = lib.GetLinkedLibsDarwin(coreApplications)
-		case "linux":
-			coreLibs = lib.GetLinkedLibsLinux(coreApplications)
-		}
+		coreLibs = lib.GetLinkedLibs(coreApplications)
 		s.Stop()
 
 		s.Suffix = " Copying core system into selected directory... "
