@@ -73,7 +73,7 @@ to quickly create a Cobra application.`,
 		}
 		if _, err := os.Stat(args[1]); os.IsNotExist(err) {
 			fmt.Println("Selected path doesn't exist, will attempt to create it...")
-			makeDirErr := os.Mkdir(args[1], 0777)
+			makeDirErr := os.MkdirAll(args[1], 0777)
 			if makeDirErr != nil {
 				log.Fatal("The directory " + args[1] + " couldn't be created")
 			}
