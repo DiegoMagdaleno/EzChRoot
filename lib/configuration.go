@@ -33,10 +33,15 @@ func checkIfConfigPathExists(configPath string) bool {
 }
 
 func WriteNewPath(chrootName string, chrootPath string) {
-	usr, err := user.Current()
-	if err != nil {
-		log.Panic("Error")
+	var usr *user.User
+	switch realUser := os.Getuid(); realUser {
+	case 0:
+		sudoer := os.Getenv("SUDO_USER")
+		usr, _ = user.Lookup(sudoer)
+	default:
+		usr, _ = user.Current()
 	}
+
 	if _, err := os.Stat(usr.HomeDir + "/.config/ezchroot/paths"); err == nil {
 
 		configPathWasOpened, err := os.Stat(usr.HomeDir + "/.config/ezchroot/paths")
