@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -15,24 +14,6 @@ type ChrootConfig struct {
 	Path string
 	Bins map[string]string
 	Libs []string
-}
-
-func Testing() {
-	newChroot := ChrootConfig{
-		Name: "test",
-		Path: "/home/diego/Documents/tests/ezchroot/5",
-		Bins: map[string]string{"/bin/bash": "/lib64/cock"},
-		Libs: []string{"/lib64/cock"},
-	}
-
-	testJSON, err := json.MarshalIndent(newChroot, "", " ")
-	if err != nil {
-		log.Panic(err)
-	}
-
-	fmt.Println(newChroot)
-
-	fmt.Println(string(testJSON))
 }
 
 func checkIfConfigPathExists(configPath string) bool {
