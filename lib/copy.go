@@ -37,6 +37,7 @@ import (
 	"log"
 	"os"
 	"os/user"
+	"runtime"
 	"strings"
 
 	cpd "github.com/nmrshll/go-cp"
@@ -57,6 +58,10 @@ final destination to where the user wants the chroot to be
 generated*/
 func CopyToDir(bins []string, libs []string, path string) {
 	libs = append(bins, libs...)
+	// This isnt a very good workaround ngl
+	if runtime.GOOS == "linux" {
+		libs = append(libs, "/lib64/ld-linux-x86-64.so.2")
+	}
 	for i := range libs {
 
 		/* We do this because, as chmod, Go doesn't copy the trailing path
@@ -91,6 +96,9 @@ func CopyToDir(bins []string, libs []string, path string) {
 		destRoot.Close()
 	}
 }
+
+// I think this should be redone the way it is now
+// going to be handled on linux, will test on DArwin in the future
 
 /*CopyAdditionalSettings allows us to, copy
 anything that should be included in order for the chroot
