@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -8,6 +9,13 @@ import (
 	"os/user"
 	"strings"
 )
+
+type ChrootConfig struct {
+	Name string
+	Path string
+	Bins []string
+	Libs []string
+}
 
 func checkIfConfigPathExists(configPath string) bool {
 	src, err := os.Stat(configPath)
@@ -32,8 +40,31 @@ func checkIfConfigPathExists(configPath string) bool {
 	return false
 }
 
-func WriteNewPath(chrootName string, chrootPath string) {
+func checkConfigFile(configFile string) error {
+	_, err := os.Stat(configFile)
+	if os.IsNotExist(err) {
+		_, err := os.Create(configFile)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func WriteNewPath(chrootName string, chrootPath string, chrootBins []string, chrootLibs []string) {
+
 	var usr *user.User
+	newChroot := &ChrootConfig{
+		Name: chrootName,
+		Path: chrootPath,
+		Bins: chrootBins,
+		Libs: chrootLibs,
+	}
+	configRelativePath := "/.config/ezchroot/roots"
+	existingConfigData := []ChrootConfig{}
+
+	existingConfigData = append(existingConfigData, *newChroot)
+
 	switch realUser := os.Getuid(); realUser {
 	case 0:
 		sudoer := os.Getenv("SUDO_USER")
@@ -42,50 +73,19 @@ func WriteNewPath(chrootName string, chrootPath string) {
 		usr, _ = user.Current()
 	}
 
-	if _, err := os.Stat(usr.HomeDir + "/.config/ezchroot/paths"); err == nil {
+	existingConfigDataToBytes, err := json.Marshal(existingConfigData)
+	if err != nil {
+		log.Panic(err)
+	}
 
-		configPathWasOpened, err := os.Stat(usr.HomeDir + "/.config/ezchroot/paths")
+	err = checkConfigFile(usr.HomeDir + configRelativePath)
+	if err != nil {
+		log.Panic(err)
+	}
 
-		if err != nil {
-			log.Panic(err)
-		}
-
-		sizeOfConfig := configPathWasOpened.Size()
-
-		if sizeOfConfig == 0 {
-			err := ioutil.WriteFile(usr.HomeDir+"/.config/ezchroot/paths", []byte(chrootName+":"+chrootPath+"\n"), 0644)
-			if err != nil {
-				log.Panic(err)
-			}
-		} else {
-			file, err := os.OpenFile(usr.HomeDir+"/.config/ezchroot/paths", os.O_APPEND|os.O_WRONLY, 0644)
-			if err != nil {
-				log.Panic(err)
-			}
-
-			defer file.Close()
-
-			if _, err := file.WriteString(chrootName + ":" + chrootPath + "\n"); err != nil {
-				log.Panic(err)
-			}
-		}
-
-	} else {
-		directoryExists := checkIfConfigPathExists(usr.HomeDir + "/.config/ezchroot")
-		if !directoryExists {
-			log.Panic("Directory of configuration was not created do you have proper perms?")
-		}
-
-		configFile, err := os.Create(usr.HomeDir + "/.config/ezchroot/paths")
-
-		if err != nil {
-			log.Panic("Could not create configuration file")
-		}
-
-		configFile.Close()
-
-		WriteNewPath(chrootName, chrootPath)
-
+	err = ioutil.WriteFile(usr.HomeDir+configRelativePath, existingConfigDataToBytes, 0644)
+	if err != nil {
+		log.Panic(err)
 	}
 
 }
