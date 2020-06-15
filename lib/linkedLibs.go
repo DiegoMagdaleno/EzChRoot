@@ -56,6 +56,11 @@ func stringInSlice(str string, list []string) bool {
 	return false
 }
 
+/*GetLinkedLibs is a function that allows us to
+ * get libraries, that are necesary for getting a file to
+ * run, the command changes, depending if it is an ELF binary (Linux)
+ * or a mach-o binary (Darwin)
+ */
 func GetLinkedLibs(libraryFile []string) []string {
 	var splitDelimiter string
 	var library []byte

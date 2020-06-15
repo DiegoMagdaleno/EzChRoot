@@ -10,6 +10,13 @@ import (
 	"strings"
 )
 
+/*ChrootConfig type allows us to
+ * unify storing into a data structure
+ * the information of a chroot, like the bins
+ * libraries, name and path
+ * its meant to make post configuration of a chroot
+ * easier.
+ */
 type ChrootConfig struct {
 	Name string
 	Path string
@@ -51,6 +58,15 @@ func checkConfigFile(configFile string) error {
 	return nil
 }
 
+/*WriteNewPath allows us to write the configuration
+ * of the Chroot from memory to a file, so we can
+ * modify it later.
+ * It is stored on a JSON file, usignt the Chroot configstruct
+ * The way this works, is by writing our bytes into a file
+ * Currently it is unable to have multiple chroots due to the nature
+ * of JSON and not using append mode, however I do plan on
+ * fixing this
+ */
 func WriteNewPath(chrootName string, chrootPath string, chrootBins []string, chrootLibs []string) {
 
 	var usr *user.User
