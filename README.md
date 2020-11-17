@@ -1,5 +1,9 @@
 # EzChroot
 
+## NOTICE: Due to changes in library cache in macOS Big Sur, this repository has been deprecated and no development of EzChRoot will take place, unless a workaround is found.
+
+## EzChRoot should work without issues under Catalina and Linux, but if they ever break I can't fix, unless a workaround for Big Sur is found.
+
 A new tool for easily creating and managing your chroots in Darwin based systems (macOS and friends)!
 
 [![GitHub issues](https://img.shields.io/github/issues/DiegoMagdaleno/EzChRoot?style=for-the-badge)](https://github.com/DiegoMagdaleno/EzChRoot/issues)
