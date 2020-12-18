@@ -33,10 +33,10 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/user"
 
 	"github.com/spf13/cobra"
 
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
@@ -90,13 +90,9 @@ func initConfig() {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
+		var usr user.User
 		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
+		home := usr.HomeDir
 		// Search config in home directory with name ".EzChRoot" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".EzChRoot")
