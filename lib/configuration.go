@@ -76,7 +76,17 @@ func WriteNewPath(chrootName string, chrootPath string, chrootBins []string, chr
 		Bins: chrootBins,
 		Libs: chrootLibs,
 	}
-	configRelativePath := "/.config/ezchroot/roots"
+	configPath := fmt.Sprintf("%s/.config/ezchroot/roots", usr.HomeDir)
+
+	confExists, err := exists(configPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if !confExists {
+		os.Mkdir(config)
+	}
+
 	existingConfigData := []ChrootConfig{}
 
 	existingConfigData = append(existingConfigData, *newChroot)
@@ -94,12 +104,12 @@ func WriteNewPath(chrootName string, chrootPath string, chrootBins []string, chr
 		log.Panic(err)
 	}
 
-	err = checkConfigFile(usr.HomeDir + configRelativePath)
+	err = checkConfigFile(configPath)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	err = ioutil.WriteFile(usr.HomeDir+configRelativePath, existingConfigDataToBytes, 0644)
+	err = ioutil.WriteFile(configPath, existingConfigDataToBytes, 0644)
 	if err != nil {
 		log.Panic(err)
 	}

@@ -47,15 +47,6 @@ var (
 
 var libraries = []string{}
 
-func stringInSlice(str string, list []string) bool {
-	for _, v := range list {
-		if v == str {
-			return true
-		}
-	}
-	return false
-}
-
 /*GetLinkedLibs is a function that allows us to
  * get libraries, that are necesary for getting a file to
  * run, the command changes, depending if it is an ELF binary (Linux)
