@@ -108,6 +108,8 @@ func CopyAdditionalSettings(path string) {
 
 	GetConfig(&config)
 	var additionalFiles = config.Extra
+	MountAll(path)
+	copyNodes(path)
 	for i := range additionalFiles {
 
 		splitStr := strings.Split(path+additionalFiles[i], "/")
