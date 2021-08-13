@@ -36,7 +36,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/user"
 	"runtime"
 	"strings"
 
@@ -105,22 +104,10 @@ anything that should be included in order for the chroot
 to work, for example, basic configuration files in
 /etc, and the user*/
 func CopyAdditionalSettings(path string) {
-	var realUser string
-	if os.Getuid() == 0 {
-		sudoer := os.Getenv("SUDO_USER")
-		getUser, err := user.Lookup(sudoer)
-		if err != nil {
-			log.Fatal(err)
-		}
-		realUser = string(getUser.HomeDir)
-	} else {
-		getUser, err := user.Current()
-		realUser = string(getUser.HomeDir)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-	var additionalFiles = []string{"/dev/null", "/dev/console", "/dev/tty", realUser + "/.ssh", "/etc/hosts", "/etc/resolv.conf"}
+	var config ChrootConfig
+
+	GetConfig(&config)
+	var additionalFiles = config.Extra
 	for i := range additionalFiles {
 
 		splitStr := strings.Split(path+additionalFiles[i], "/")

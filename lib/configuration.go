@@ -16,7 +16,8 @@ import (
  * easier.
  */
 type ChrootConfig struct {
-	Bins []string `yaml:"bins"`
+	Bins  []string `yaml:"bins"`
+	Extra []string `yaml:"extras"`
 }
 
 func GetConfig(cfg *ChrootConfig) {
