@@ -35,7 +35,6 @@ import (
 	"log"
 	"os"
 	"regexp"
-	"runtime"
 	"time"
 
 	"github.com/briandowns/spinner"
@@ -62,12 +61,10 @@ to quickly create a Cobra application.`,
 			path            = args[1]
 			s               = spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 		)
-		switch os := runtime.GOOS; os {
-		case "darwin":
-			coreApplications = []string{"/bin/sh", "/bin/bash", "/bin/cat", "/bin/ls", "/bin/mkdir", "/bin/mv", "/bin/rm", "/bin/rmdir", "/bin/sleep", "/sbin/ping", "/usr/bin/curl", "/usr/bin/dig", "/usr/bin/env", "/usr/bin/grep", "/usr/bin/host", "/usr/bin/id", "/usr/bin/less", "/usr/bin/ssh", "/usr/bin/ssh-add", "/usr/bin/uname", "/usr/bin/vi", "/usr/lib/dyld", "/usr/sbin/netstat", "/usr/bin/clear"}
-		case "linux":
-			coreApplications = []string{"/bin/bash", "/bin/ls", "/bin/cp", "/bin/rm", "/bin/cat", "/bin/mkdir", "/bin/ln", "/bin/grep", "/bin/cut", "/bin/sed", "/usr/bin/ssh", "/usr/bin/head", "/usr/bin/tail", "/usr/bin/which", "/usr/bin/id", "/usr/bin/find", "/usr/bin/xargs"}
-		}
+
+		var config lib.ChrootConfig
+		lib.GetConfig(&config)
+		coreApplications = config.Bins
 		if !validateName.Match([]byte(args[0])) {
 			log.Fatal(args[0] + " is not a valid name!")
 		}
@@ -102,7 +99,6 @@ to quickly create a Cobra application.`,
 		lib.CopyAdditionalSettings(path + "/" + name)
 		s.Stop()
 
-		lib.WriteNewPath(name, path, coreApplications, coreLibs)
 	},
 }
 

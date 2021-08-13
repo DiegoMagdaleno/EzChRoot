@@ -3,6 +3,7 @@ module github.com/diegomagdaleno/EzChRoot
 go 1.13
 
 require (
+	github.com/adrg/xdg v0.3.3 // indirect
 	github.com/briandowns/spinner v1.9.0
 	github.com/codeskyblue/go-sh v0.0.0-20190412065543-76bd3d59ff27
 	github.com/mattn/go-isatty v0.0.12 // indirect
@@ -12,4 +13,5 @@ require (
 	github.com/spf13/cobra v0.0.6
 	github.com/spf13/viper v1.6.2
 	golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
