@@ -35,6 +35,7 @@ EzChroot was my first project on Golang after years of only writing Python, so i
 <p align="Center">
  <img width="460" height="300" src="https://media.giphy.com/media/LRlCIiIeUy3xkGsOSJ/giphy.gif">
 </p>
+
 ## Installation
 
 Here is some information on how to install EzChRoot in your Mac!
