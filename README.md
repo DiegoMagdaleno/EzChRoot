@@ -1,33 +1,47 @@
-# EzChroot
+# Table of contents
 
-## NOTICE: Due to changes in library cache in macOS Big Sur, this repository has been deprecated and no development of EzChRoot will take place, unless a workaround is found.
-
-## EzChRoot should work without issues under Catalina and Linux, but if they ever break I can't fix, unless a workaround for Big Sur is found.
-
-A new tool for easily creating and managing your chroots in Darwin based systems (macOS and friends)!
-
-[![GitHub issues](https://img.shields.io/github/issues/DiegoMagdaleno/EzChRoot?style=for-the-badge)](https://github.com/DiegoMagdaleno/EzChRoot/issues)
-[![GitHub forks](https://img.shields.io/github/forks/DiegoMagdaleno/EzChRoot?style=for-the-badge)](https://github.com/DiegoMagdaleno/EzChRoot/network)
-[![GitHub stars](https://img.shields.io/github/stars/DiegoMagdaleno/EzChRoot?style=for-the-badge)](https://github.com/DiegoMagdaleno/EzChRoot/stargazers)
-[![GitHub license](https://img.shields.io/github/license/DiegoMagdaleno/EzChRoot?style=for-the-badge)](https://github.com/DiegoMagdaleno/EzChRoot/blob/master/LICENSE)
-
-![See it in action](https://media.giphy.com/media/LRlCIiIeUy3xkGsOSJ/giphy.gif)
-
-## Table of Contents
-
-- [Installation](#installation)
+- [EzChroot](#ezchroot)
+- [Why it was deprecated?](#why-was-it-deprecated)
+- [How could it be improved?](#how-could-it-be-improved)
 - [Features](#features)
-- [Contributing](#contributing)
-- [Support](#support)
+- [Installation](#installation)
 - [License](#license)
 
+## EzChroot
+
+EzChroot was a proof of concept of making a way to easily create Chroot "jails" in modern versions of macOS, before writing this I tried scattering across the internet to find a solution that I liked, however, I ended up not liking any implementation, as they were bash scripts and so on, this is how I decided to write my own simple implementation.
+
+Some days later I added support for Linux, to also be able to create some Chroot there.
+
+## Why was it deprecated?
+
+In retrospect, it isn't good or special at all, but it was deprecated due to changes in macOS, during sometime in 2020 during the release of Big Sur, Apple changed the way System Dynamic Libraries worked, as they weren't in the filesystem anymore, but rather in a custom cache designed by Apple, this represented a big problem for EzChroot, as it depended on getting the linked libraries of each binary and then copying them over to the folder where the Chroot env was going to be located.
+
+While I tried some other techniques to fix it, such as dumping the cache by forking [dyld](https://github.com/DiegoMagdaleno/dyld) it was ultimately impossible to get the Chroot to work, because of some changes on how the libraries are loaded in macOS.
+
+While Linux support was still an option to maintain this project, there are much better utilities for Linux that do satisfy my necessities, so there is no reason to develop Yet Another Tool.
+
+## How could it be improved?
+
+EzChroot was my first project on Golang after years of only writing Python, so it does have a lot of room for improvement if I were to come back and time and do it from scratch:
+
+- Don't call Otool: At the time of writing this program, my knowledge on macOS was low to say at best, so I just researched how to dump the shared libraries, this ultimately ended up in me using the `os.exec()` to run a command that I found on StackOverflow, if I were to write this today, I would implement a Mach-O parser, and get the proper headers were the dynamic libraries are located.
+
+- Use a database: At the time of writing this, my knowledge of databases was almost `nil` as you would say in Go, this had the implication that EzChroot tried to store stuff into a JSON file, which was extremely wrong and hard to use, the proper way if I were to write this today would be to use SQLite or another lightweight local database.
+
+- Don't hardcode "essential" binaries: When I made EzChroot, I made it just thinking about my necessities, which ultimately resulted in my hardcoding paths that other people didn't have, if I were to write this today, I would have made a dotfile that is inside the directory where you want to create the chroot, containing the names of the binaries you might want to copy.
+
+
+<p align="Center">
+ <img width="460" height="300" src="https://media.giphy.com/media/LRlCIiIeUy3xkGsOSJ/giphy.gif">
+</p>
 ## Installation
 
 Here is some information on how to install EzChRoot in your Mac!
 
 - **Option 1 - Precompiled bin**:
   - Go to GitHub releases in this repository
-  - Download the lastest release
+  - Download the latest release
   - Copy the bin inside `/usr/local` or whatever directory you prefer
   - Have fun!
   
@@ -45,36 +59,6 @@ Here is some information on how to install EzChRoot in your Mac!
   - Create a chroot
   - Delete a chroot
   
- ## Contributing
-  
-  - **Contributing code**:
- 
-    If you decide to contribute to this project here are the instructions to get you started ^_^
-  
-
-      1. Fork this repository
-      2. Git clone this repository into your computer
-      3. Hack it and have fun.
-      4. Push and submit a pull request!
-
-  - **Contributing ideas and requests**:
-  
-    If you like and enjoy EzChroot but you still think there is a feature missing, don't hesitate to ask nicely about it!
-    
-      1. Open a new GitHub issue
-      2. Submit with a good explanation what your feature should do
-      3. Be patient, I do this in my free time
-      
- - **Contributing love and fun**:
- 
-    Sure you can, if you really enjoy my little program, send me an email! I appreciate it a lot!
-
-## Support 
-
-Sure! I do offer support for my FOSS software, just open an issue, using the issue template, and wait for me to look into it and fix it.
-
-If find a fix or workaround, please share it!, and also if you can submit patches would be even better!
-
 ## License
 
 BSD-3-Clause
